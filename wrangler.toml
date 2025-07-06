@@ -1,4 +1,4 @@
-name = "idex-tracker"
+name = "ide6"
 compatibility_date = "2025-07-06"
 main = "worker.js"
 
