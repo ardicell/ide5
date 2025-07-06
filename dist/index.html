@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lacak Resi ID Express</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --gray: #95a5a6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--secondary);
+        }
+
+        .form-container {
+            background: var(--light);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error-message {
+            background: #ffecec;
+            color: var(--danger);
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            border-left: 4px solid var(--danger);
+        }
+
+        .summary, .timeline {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary h2, .timeline h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: block;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .status {
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .status.delivered {
+            background: #e8f5e9;
+            color: var(--success);
+        }
+
+        .status.success {
+            background: #e3f2fd;
+            color: var(--secondary);
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-point {
+            width: 20px;
+            height: 20px;
+            background: var(--secondary);
+            border-radius: 50%;
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+            margin-right: 15px;
+            margin-top: 5px;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 10px;
+            height: calc(100% - 20px);
+            width: 2px;
+            background: var(--secondary);
+            z-index: 0;
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-content {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            flex-grow: 1;
+            border-left: 3px solid var(--secondary);
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .timeline-time {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .timeline-status {
+            background: #e3f2fd;
+            color: var(--secondary);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .timeline-detail > div {
+            margin-bottom: 8px;
+        }
+
+        .photo-link a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            padding: 5px 10px;
+            background: #e3f2fd;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .photo-link a:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        /* Styling untuk detail log */
+        .log-detail {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            border-left: 4px solid #3498db;
+            display: none;
+        }
+        
+        .log-detail.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .log-detail-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .log-detail-item {
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        
+        .log-detail-item strong {
+            display: block;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .log-toggle {
+            cursor: pointer;
+            color: #3498db;
+            font-weight: bold;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        
+        .log-toggle i {
+            margin-right: 5px;
+            transition: transform 0.3s;
+        }
+        
+        .log-toggle.active i {
+            transform: rotate(180deg);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Styling untuk bagian bagikan */
+        .share-section {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .share-section h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .share-options {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        #shareUrl {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+        }
+        
+        #copyBtn {
+            padding: 10px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        
+        .social-share {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .whatsapp-btn, .telegram-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .whatsapp-btn {
+            background: #25D366;
+        }
+        
+        .telegram-btn {
+            background: #0088cc;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .info-box p {
+            margin: 5px 0;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .form-container, .summary, .timeline {
+                padding: 15px;
+            }
+            
+            .timeline-header {
+                flex-direction: column;
+            }
+            
+            .timeline-status {
+                margin-top: 5px;
+            }
+            
+            .log-detail-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .share-options {
+                flex-direction: column;
+            }
+            
+            #copyBtn {
+                border-radius: 4px;
+                margin-top: 10px;
+            }
+            
+            .social-share {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛺 Lacak Resi ID Express</h1>
+        
+        <div class="info-box">
+            <p><strong>Contoh Nomor Resi:</strong> IDE1234567890123</p>
+            <p><strong>Contoh PIN Resi:</strong> 4 digit terakhir nomor telepon pengirim/penerima (contoh: 1234)</p>
+        </div>
+        
+        <div class="form-container">
+            <form id="trackingForm">
+                <div class="input-group">
+                    <label for="waybillNo">Nomor Resi:</label>
+                    <input type="text" id="waybillNo" placeholder="Contoh: IDE1234567890123" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="pin">PIN Resi:</label>
+                    <input type="text" id="pin" placeholder="Contoh: 1234" required>
+                </div>
+                
+                <button type="submit">Lacak Pengiriman</button>
+            </form>
+        </div>
+        
+        <div id="result" class="hidden">
+            <div class="summary">
+                <h2>Informasi Pengiriman</h2>
+                <div id="summaryContent"></div>
+            </div>
+            
+            <div class="timeline">
+                <h2>Riwayat Pengiriman</h2>
+                <div id="timelineContent"></div>
+            </div>
+            
+            <div id="shareSection" class="share-section">
+                <h3>Bagikan Perjalanan Ini</h3>
+                <div class="share-options">
+                    <input type="text" id="shareUrl" readonly>
+                    <button id="copyBtn">Salin Link</button>
+                </div>
+                <div class="social-share">
+                    <button class="whatsapp-btn"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                    <button class="telegram-btn"><i class="fab fa-telegram"></i> Telegram</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="error" class="hidden error-message"></div>
+    </div>
+
+    <script>
+        // Handle URL parameters
+        document.addEventListener('DOMContentLoaded', function() {
+            const url = new URL(window.location.href);
+            const pathParts = url.pathname.split('/');
+            
+            // Handle /resi/IDE123/456 format
+            if (pathParts.length >= 4 && pathParts[1] === 'resi') {
+                const waybillNo = pathParts[2];
+                const pin = pathParts[3];
+                
+                document.getElementById('waybillNo').value = waybillNo;
+                document.getElementById('pin').value = pin;
+                document.getElementById('trackingForm').dispatchEvent(new Event('submit'));
+            }
+            // Handle query parameters
+            else {
+                const urlParams = new URLSearchParams(window.location.search);
+                const resiParam = urlParams.get('resi');
+                const pinParam = urlParams.get('pin');
+                
+                if (resiParam && pinParam) {
+                    document.getElementById('waybillNo').value = resiParam;
+                    document.getElementById('pin').value = pinParam;
+                    document.getElementById('trackingForm').dispatchEvent(new Event('submit'));
+                }
+            }
+        });
+
+        // Tracking form submission
+        document.getElementById('trackingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const waybillNo = document.getElementById('waybillNo').value.trim();
+            const pin = document.getElementById('pin').value.trim();
+            
+            if (!waybillNo || !pin) {
+                showError('Harap masukkan nomor resi dan PIN');
+                return;
+            }
+            
+            // Validasi format nomor resi
+            if (!/^IDE\d{13}$/.test(waybillNo)) {
+                showError('Format nomor resi tidak valid. Contoh: IDE1234567890123');
+                return;
+            }
+            
+            // Validasi format PIN (4 digit angka)
+            if (!/^\d{4}$/.test(pin)) {
+                showError('PIN harus 4 digit angka. Contoh: 1234');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/track?noResi=${waybillNo}&pin=${pin}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.code !== 0 || !data.data || data.data.length === 0) {
+                    showError('Data pengiriman tidak ditemukan');
+                    return;
+                }
+                
+                displayResults(data.data[0], waybillNo, pin);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Gagal mengambil data. Silakan coba lagi.');
+            }
+        });
+        
+        function displayResults(shipment, waybillNo, pin) {
+            const summaryContent = document.getElementById('summaryContent');
+            
+            // Display shipment summary
+            summaryContent.innerHTML = `
+                <div class="summary-item">
+                    <strong>No. Order:</strong> ${shipment.orderNo || '-'}
+                </div>
+                <div class="summary-item">
+                    <strong>No. Resi:</strong> ${shipment.waybillNo || '-'}
+                </div>
+                <div class="summary-item">
+                    <strong>Tanggal Kirim:</strong> ${formatDate(shipment.shippingTime) || '-'}
+                </div>
+                <div class="summary-item">
+                    <strong>Pengirim:</strong> ${shipment.senderName || '-'} (${shipment.senderCityName || '-'} ${shipment.senderDistrictName || '-'})
+                </div>
+                <div class="summary-item">
+                    <strong>Penerima:</strong> ${shipment.recipientName || '-'} (${shipment.recipientCityName || '-'} ${shipment.recipientDistrictName || '-'})
+                </div>
+                <div class="summary-item">
+                    <strong>Status:</strong> <span class="status ${getStatusClass(shipment.waybillStatus)}">${getStatusText(shipment.waybillStatus)}</span>
+                </div>
+            `;
+            
+            const timelineContent = document.getElementById('timelineContent');
+            timelineContent.innerHTML = '';
+            
+            // Display all scan data with toggle for details
+            shipment.scanLineVOS.forEach((scan, index) => {
+                const scanElement = document.createElement('div');
+                scanElement.className = 'timeline-item';
+                
+                scanElement.innerHTML = `
+                    <div class="timeline-point"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <span class="timeline-time">${formatTime(scan.operationTime)}</span>
+                            <span class="timeline-status">${getOperationText(scan.operationType)}</span>
+                        </div>
+                        <div class="timeline-detail">
+                            <div><strong>Lokasi:</strong> ${scan.operationBranchName || '-'}</div>
+                            <div><strong>Operator:</strong> ${scan.operationUserName || '-'}</div>
+                            ${scan.courierName ? `<div><strong>Kurir:</strong> ${scan.courierName}</div>` : ''}
+                            ${scan.driverName ? `<div><strong>Sopir:</strong> ${scan.driverName}</div>` : ''}
+                            ${scan.photoUrl ? `<div class="photo-link"><a href="${scan.photoUrl}" target="_blank">📸 Lihat Foto Bukti</a></div>` : ''}
+                        </div>
+                        
+                        <div class="log-toggle" data-index="${index}">
+                            <i class="fas fa-chevron-down"></i> Lihat Detail Lengkap
+                        </div>
+                        
+                        <div class="log-detail" id="log-detail-${index}">
+                            <div class="log-detail-content">
+                                <div class="log-detail-item">
+                                    <strong>ID:</strong> ${scan.id || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>No. Resi:</strong> ${scan.waybillNo || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Waktu Pencatatan:</strong> ${formatDateTime(scan.recordTime) || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Waktu Operasi:</strong> ${formatDateTime(scan.operationTime) || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>ID Cabang:</strong> ${scan.operationBranchId || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Nama Cabang:</strong> ${scan.operationBranchName || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Cabang Sebelumnya:</strong> ${scan.previousBranchName || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Lokasi Berikutnya:</strong> ${scan.nextLocationName || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Cabang Berikutnya:</strong> ${scan.nextBranchName || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>ID Operator:</strong> ${scan.operationUserId || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Nama Operator:</strong> ${scan.operationUserName || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Nama Kurir:</strong> ${scan.courierName || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Nama Pengemudi:</strong> ${scan.driverName || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Nama Shift:</strong> ${scan.shiftName || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Tipe Operasi:</strong> ${scan.operationType || '-'} (${getOperationText(scan.operationType)})
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Nomor Bag:</strong> ${scan.bagNo || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Tag Kendaraan:</strong> ${scan.vehicleTagNo || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Plat Nomor:</strong> ${scan.licensePlate || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Penanda Tangan:</strong> ${scan.signer || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>URL Foto:</strong> ${scan.photoUrl ? `<a href="${scan.photoUrl}" target="_blank">${scan.photoUrl}</a>` : '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Tipe Masalah:</strong> ${scan.problemType || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Kode Masalah:</strong> ${scan.problemCode || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Alasan (ID):</strong> ${scan.registerReasonBahasa || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Tipe Retur (ID):</strong> ${scan.returnTypeBahasa || '-'}
+                                </div>
+                                <div class="log-detail-item">
+                                    <strong>Metode Transportasi:</strong> ${scan.transportationMethod || '-'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                timelineContent.appendChild(scanElement);
+                
+                // Add event listener for toggle
+                const toggleElement = scanElement.querySelector('.log-toggle');
+                toggleElement.addEventListener('click', function() {
+                    const index = this.getAttribute('data-index');
+                    const detailElement = document.getElementById(`log-detail-${index}`);
+                    detailElement.classList.toggle('active');
+                    this.classList.toggle('active');
+                });
+            });
+            
+            // Set share URL
+            const shareUrl = `${window.location.origin}/resi/${waybillNo}/${pin}`;
+            document.getElementById('shareUrl').value = shareUrl;
+            
+            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('error').classList.add('hidden');
+            
+            // Setup copy button
+            document.getElementById('copyBtn').addEventListener('click', function() {
+                const copyText = document.getElementById('shareUrl');
+                copyText.select();
+                document.execCommand('copy');
+                alert('Link berhasil disalin!');
+            });
+            
+            // Setup social share buttons
+            document.querySelector('.whatsapp-btn').addEventListener('click', function() {
+                const text = `Lacak perjalanan paket saya: ${shareUrl}`;
+                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+            });
+            
+            document.querySelector('.telegram-btn').addEventListener('click', function() {
+                const text = `Lacak perjalanan paket saya: ${shareUrl}`;
+                window.open(`https://t.me/share/url?url=${encodeURIComponent(text)}`, '_blank');
+            });
+        }
+        
+        function showError(message) {
+            const errorElement = document.getElementById('error');
+            errorElement.textContent = message;
+            errorElement.classList.remove('hidden');
+            document.getElementById('result').classList.add('hidden');
+        }
+        
+        function formatDate(dateTime) {
+            if (!dateTime) return '-';
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return new Date(dateTime).toLocaleDateString('id-ID', options);
+        }
+        
+        function formatTime(dateTime) {
+            if (!dateTime) return '-';
+            const options = { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                day: '2-digit',
+                month: 'short'
+            };
+            return new Date(dateTime).toLocaleTimeString('id-ID', options);
+        }
+        
+        function formatDateTime(dateTime) {
+            if (!dateTime) return '-';
+            const options = { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            return new Date(dateTime).toLocaleString('id-ID', options);
+        }
+        
+        function getStatusText(status) {
+            const statusMap = {
+                '00': 'Manifest',
+                '01': 'Dalam Perjalanan',
+                '02': 'Tiba di Cabang',
+                '03': 'Terkirim',
+                '09': 'Pengiriman Sukses'
+            };
+            return statusMap[status] || `Status: ${status}`;
+        }
+        
+        function getStatusClass(status) {
+            if (status === '03') return 'delivered';
+            if (status === '09') return 'success';
+            return '';
+        }
+        
+        function getOperationText(operationType) {
+            const operationMap = {
+                '00': 'Pengiriman Diterima',
+                '04': 'Pengiriman Berangkat',
+                '05': 'Pengiriman Tiba',
+                '09': 'Pengiriman Sukses',
+                '67': 'Pengiriman Diproses'
+            };
+            return operationMap[operationType] || `Operasi: ${operationType}`;
+        }
+    </script>
+</body>
+</html>
