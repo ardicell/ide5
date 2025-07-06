@@ -1,0 +1,6 @@
+name = "idex-tracker"
+compatibility_date = "2025-07-06"
+main = "worker.js"
+
+[assets]
+directory = "./dist"
