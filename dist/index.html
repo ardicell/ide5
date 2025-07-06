@@ -498,7 +498,7 @@
             }
             
             // Validasi format nomor resi
-            if (!/^IDE\d{13}$/.test(waybillNo)) {
+            if (!/^ID\d{14}$/.test(waybillNo)) {
                 showError('Format nomor resi tidak valid. Contoh: IDE1234567890123');
                 return;
             }
